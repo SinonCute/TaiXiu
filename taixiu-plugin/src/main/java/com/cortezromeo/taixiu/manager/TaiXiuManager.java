@@ -157,11 +157,11 @@ public class TaiXiuManager {
                         message = messageF.getString("session-player-win-with-tax")
                             .replaceAll("%result%", MessageUtil.getFormatName(session.getResult()))
                             .replaceAll("%money%", MessageUtil.formatMoney(money))
-                            .replaceAll("%tax%", String.valueOf(tax)));
+                            .replaceAll("%tax%", String.valueOf(tax));
                     } else {
                         message = messageF.getString("session-player-win")
                             .replaceAll("%result%", MessageUtil.getFormatName(session.getResult()))
-                            .replaceAll("%money%", MessageUtil.formatMoney(money)));
+                            .replaceAll("%money%", MessageUtil.formatMoney(money));
                     }
 
                     econ.depositPlayer(player, money);
