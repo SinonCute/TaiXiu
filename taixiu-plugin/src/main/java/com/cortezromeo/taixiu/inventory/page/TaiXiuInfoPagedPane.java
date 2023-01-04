@@ -21,6 +21,8 @@ import static com.cortezromeo.taixiu.util.MessageUtil.getFormatName;
 
 public class TaiXiuInfoPagedPane {
 
+    private static final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
+
     public static void openInventory(Player p, long session) {
         FileConfiguration invF = InventoryFile.get();
         PagedPane pagedPane = new PagedPane(invF.getInt("inventory.taiXiuInfo.rows") - 2,
@@ -29,8 +31,8 @@ public class TaiXiuInfoPagedPane {
 
         pagedPane.open(p);
 
-        Bukkit.getScheduler().runTaskAsynchronously(TaiXiu.plugin, () -> {
-            for (String player : TaiXiuManager.getSessionData(session).getXiuPlayers().keySet()) {
+        Bukkit.getScheduler().runTaskAsynchronously(TaiXiu.getPlugin(), () -> {
+            for (String player : manager.getSessionData(session).getXiuPlayers().keySet()) {
                 try {
                     pagedPane.addButton(new Button(getItem(
                             invF.getString("inventory.taiXiuInfo.items.bet-player.type"),
@@ -43,7 +45,7 @@ public class TaiXiuInfoPagedPane {
                     e.printStackTrace();
                 }
             }
-            for (String player : TaiXiuManager.getSessionData(session).getTaiPlayers().keySet()) {
+            for (String player : manager.getSessionData(session).getTaiPlayers().keySet()) {
                 try {
                     pagedPane.addButton(new Button(getItem(
                             invF.getString("inventory.taiXiuInfo.items.bet-player.type"),
@@ -79,8 +81,8 @@ public class TaiXiuInfoPagedPane {
                     .replaceAll("%bet%", getFormatName(bet))
                     .replaceAll("%money%",
                             (bet == TaiXiuResult.XIU
-                                    ? MessageUtil.formatMoney(TaiXiuManager.getSessionData(session).getXiuPlayers().get(playerName))
-                                    : MessageUtil.formatMoney(TaiXiuManager.getSessionData(session).getTaiPlayers().get(playerName))));
+                                    ? MessageUtil.formatMoney(manager.getSessionData(session).getXiuPlayers().get(playerName))
+                                    : MessageUtil.formatMoney(manager.getSessionData(session).getTaiPlayers().get(playerName))));
 
 
             materialMeta.setDisplayName(TaiXiu.nms.addColor(name));
@@ -93,8 +95,8 @@ public class TaiXiuInfoPagedPane {
                     .replaceAll("%bet%", getFormatName(bet))
                     .replaceAll("%money%",
                             (bet == TaiXiuResult.XIU
-                                    ? MessageUtil.formatMoney(TaiXiuManager.getSessionData(session).getXiuPlayers().get(playerName))
-                                    : MessageUtil.formatMoney(TaiXiuManager.getSessionData(session).getTaiPlayers().get(playerName))));
+                                    ? MessageUtil.formatMoney(manager.getSessionData(session).getXiuPlayers().get(playerName))
+                                    : MessageUtil.formatMoney(manager.getSessionData(session).getTaiPlayers().get(playerName))));
 
             newList.add(TaiXiu.nms.addColor(string));
         }

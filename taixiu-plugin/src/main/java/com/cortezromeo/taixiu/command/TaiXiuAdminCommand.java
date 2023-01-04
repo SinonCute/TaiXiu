@@ -25,11 +25,12 @@ import static com.cortezromeo.taixiu.manager.DebugManager.setDebug;
 import static com.cortezromeo.taixiu.util.MessageUtil.sendBoardCast;
 
 public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
-    private TaiXiu plugin;
+    private final TaiXiu plugin;
+    private final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
 
     public TaiXiuAdminCommand(TaiXiu plugin) {
         this.plugin = plugin;
-        plugin.getCommand("taixiuadmin").setExecutor((CommandExecutor) this);
+        plugin.getCommand("taixiuadmin").setExecutor(this);
     }
 
     @Override
@@ -47,29 +48,30 @@ public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
         if (args.length == 1) {
             switch (args[0]) {
                 case "changestate":
-                    if (TaiXiuManager.getState() == TaiXiuState.PLAYING) {
-                        TaiXiuManager.setState(TaiXiuState.PAUSING);
+                    if (manager.getState() == TaiXiuState.PLAYING) {
+                        manager.setState(TaiXiuState.PAUSING);
                     } else {
-                        TaiXiuManager.setState(TaiXiuState.PLAYING);
+                        manager.setState(TaiXiuState.PLAYING);
                     }
-                    sendMessage(sender, messageF.getString("admin-changestate").replace("%state%", TaiXiuManager.getState().toString()));
+                    sendMessage(sender, messageF.getString("admin-changestate")
+                            .replace("%state%", manager.getState().toString()));
                     sendBoardCast(messageF.getString("admin-changestate-boardcast")
                             .replaceAll("%playerName%", sender.getName())
-                            .replaceAll("%state%", TaiXiuManager.getState().toString()));
+                            .replaceAll("%state%", manager.getState().toString()));
                     return false;
                 case "reload":
 
-                    TaiXiu.plugin.reloadConfig();
+                    plugin.reloadConfig();
                     MessageFile.reload();
                     InventoryFile.reload();
                     DatabaseManager.loadLoadingType();
                     BossBarManager.setupValue();
 
-                    setDebug(TaiXiu.plugin.getConfig().getBoolean("debug"));
-                    if (AutoSaveManager.getAutoSaveStatus() && !TaiXiu.plugin.getConfig().getBoolean("database.auto-save.enable")) {
+                    setDebug(plugin.getConfig().getBoolean("debug"));
+                    if (AutoSaveManager.getAutoSaveStatus() && !plugin.getConfig().getBoolean("database.auto-save.enable")) {
                         AutoSaveManager.stopAutoSave();
                     } else {
-                        AutoSaveManager.startAutoSave(TaiXiu.plugin.getConfig().getInt("database.auto-save.time"));
+                        AutoSaveManager.startAutoSave(plugin.getConfig().getInt("database.auto-save.time"));
                     }
                     AutoSaveManager.reloadTimeAutoSave();
 
@@ -93,7 +95,7 @@ public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
                             return false;
                         }
 
-                        TaiXiuManager.setTime(time);
+                        manager.setTime(time);
                         sendMessage(sender, messageF.getString("admin-settime").replace("%time%", String.valueOf(time)));
                         sendBoardCast(messageF.getString("admin-settime-boardcast")
                                 .replaceAll("%playerName%", sender.getName())
@@ -113,7 +115,12 @@ public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
             switch (args[0]) {
                 case "setresult":
 
-                    if (TaiXiuManager.getSessionData().getResult() != TaiXiuResult.NONE) {
+                    if (manager.getTotalBet(manager.getSessionData()) == 0) {
+                        sendMessage(sender, "%prefix%&eChưa có người chơi nào cược cho phiên này!");
+                        return false;
+                    }
+
+                    if (manager.getSessionData().getResult() != TaiXiuResult.NONE) {
                         sendMessage(sender, "%prefix%&eVui lòng đợi vài giây và xài lại lệnh này!");
                         return false;
                     }
@@ -128,7 +135,7 @@ public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
                             return false;
                         }
 
-                        TaiXiuManager.resultSeason(TaiXiuManager.getSessionData(), dice1, dice2, dice3);
+                        manager.resultSeason(manager.getSessionData(), dice1, dice2, dice3);
 
                         sendMessage(sender, messageF.getString("admin-setresult")
                                 .replaceAll("%dice1%", String.valueOf(dice1))
@@ -152,7 +159,7 @@ public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
         }
 
         for (String string : messageF.getStringList("command-taixiuadmin")) {
-            string = string.replace("%version%", TaiXiu.plugin.getDescription().getVersion());
+            string = string.replace("%version%", plugin.getDescription().getVersion());
             sendMessage(sender, string);
         }
 

@@ -19,6 +19,9 @@ import java.util.Map;
 
 public class BossBarManager {
 
+    private static final TaiXiu plugin = TaiXiu.getPlugin();
+    private static final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
+
     public static Map<Player, BossBar> bossBarPlayers = new HashMap<>();
 
     private static boolean enable;
@@ -32,7 +35,7 @@ public class BossBarManager {
 
 
     public static void setupValue() {
-        FileConfiguration config = TaiXiu.plugin.getConfig();
+        FileConfiguration config = plugin.getConfig();
 
         enable = config.getBoolean("boss-bar.enable");
         title = config.getString("boss-bar.title");
@@ -81,14 +84,14 @@ public class BossBarManager {
                 }
 
                 BossBar bossBar = bossBarPlayers.get(p);
-                ISession session = TaiXiuManager.getSessionData();
-                int timeLeft = TaiXiuManager.getTaiXiuTask().getTime();
+                ISession session = manager.getSessionData();
+                int timeLeft = manager.getTaiXiuTask().getTime();
 
                 String bossBarTitle = title.replace("%session%", String.valueOf(session.getSession()));
                 bossBarTitle = bossBarTitle.replace("%timeLeft%", String.valueOf(timeLeft));
-                bossBarTitle = bossBarTitle.replace("%totalBet%", MessageUtil.formatMoney(TaiXiuManager.getTotalBet(session)));
-                bossBarTitle = bossBarTitle.replace("%xiuBet%", MessageUtil.formatMoney(TaiXiuManager.getXiuBet(session)));
-                bossBarTitle = bossBarTitle.replace("%taiBet%", MessageUtil.formatMoney(TaiXiuManager.getTaiBet(session)));
+                bossBarTitle = bossBarTitle.replace("%totalBet%", MessageUtil.formatMoney(manager.getTotalBet(session)));
+                bossBarTitle = bossBarTitle.replace("%xiuBet%", MessageUtil.formatMoney(manager.getXiuBet(session)));
+                bossBarTitle = bossBarTitle.replace("%taiBet%", MessageUtil.formatMoney(manager.getTaiBet(session)));
                 bossBar.setTitle(TaiXiu.nms.addColor(bossBarTitle));
 
                 try {
@@ -103,10 +106,10 @@ public class BossBarManager {
                 } else
                     bossBar.setColor(colorPlaying);
 
-                if (TaiXiuManager.getState() == TaiXiuState.PAUSING)
+                if (manager.getState() == TaiXiuState.PAUSING)
                     bossBar.setColor(colorPausing);
 
             }
-        }.runTaskTimerAsynchronously(TaiXiu.plugin, 0, 20);
+        }.runTaskTimerAsynchronously(plugin, 0, 20);
     }
 }

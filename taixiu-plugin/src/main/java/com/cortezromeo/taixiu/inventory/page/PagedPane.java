@@ -41,6 +41,7 @@ public class PagedPane implements InventoryHolder {
     private int currentIndex;
     private final int pageSize;
     private final long session;
+    private final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
 
     public PagedPane(int pageSize, int rows, String title, long session) {
         Objects.requireNonNull(title, "TITLE KHÔNG ĐƯỢC ĐỂ TRỐNG");
@@ -215,7 +216,9 @@ public class PagedPane implements InventoryHolder {
                 invF.getString("inventory.taiXiuInfo.items.bet-info.value"),
                 (short) invF.getInt("inventory.taiXiuInfo.items.bet-info.data"),
                 invF.getString("inventory.taiXiuInfo.items.bet-info.name"),
-                (TaiXiuManager.getSessionData(session).getResult() != TaiXiuResult.NONE ? invF.getStringList("inventory.taiXiuInfo.items.bet-info.loreEnded") : invF.getStringList("inventory.taiXiuInfo.items.bet-info.lorePlaying")));
+                (manager.getSessionData(session).getResult() != TaiXiuResult.NONE ?
+                        invF.getStringList("inventory.taiXiuInfo.items.bet-info.loreEnded") :
+                        invF.getStringList("inventory.taiXiuInfo.items.bet-info.lorePlaying")));
         inventory.setItem((inventory.getSize() - 10) + invF.getInt("inventory.taiXiuInfo.items.bet-info.slot"), itemStack);
 
     }
@@ -238,7 +241,7 @@ public class PagedPane implements InventoryHolder {
             material.set(TaiXiu.nms.createItemStack(value, 1, itemData));
 
         ItemMeta materialMeta = material.get().getItemMeta();
-        ISession data = TaiXiuManager.getSessionData(this.session);
+        ISession data = manager.getSessionData(this.session);
 
         if (!Objects.equals(name, "")) {
             name = getString(data, name);
@@ -264,14 +267,15 @@ public class PagedPane implements InventoryHolder {
         string = string
                 .replace("%nextPage%", String.valueOf(getCurrentPage() + 1))
                 .replace("%prevPage%", String.valueOf(getCurrentPage() - 1))
-                .replace("%time%", (TaiXiuManager.getSessionData(session).getResult() != TaiXiuResult.NONE ? "0" : String.valueOf(TaiXiuManager.getTime())))
+                .replace("%time%", (manager.getSessionData(session).getResult() != TaiXiuResult.NONE ? "0" :
+                        String.valueOf(manager.getTime())))
                 .replace("%session%", String.valueOf(this.session))
                 .replace("%xiuPlayerNumber%", String.valueOf(data.getXiuPlayers().size()))
                 .replace("%taiPlayerNumber%", String.valueOf(data.getTaiPlayers().size()))
-                .replace("%xiuTotalBet%", MessageUtil.formatMoney(TaiXiuManager.getXiuBet(data)))
-                .replace("%taiTotalBet%", MessageUtil.formatMoney(TaiXiuManager.getTaiBet(data)))
-                .replace("%totalBet%", MessageUtil.formatMoney(TaiXiuManager.getTotalBet(data)))
-                .replace("%bestWinners%", TaiXiuManager.getBestWinner(TaiXiuManager.getSessionData(session)))
+                .replace("%xiuTotalBet%", MessageUtil.formatMoney(manager.getXiuBet(data)))
+                .replace("%taiTotalBet%", MessageUtil.formatMoney(manager.getTaiBet(data)))
+                .replace("%totalBet%", MessageUtil.formatMoney(manager.getTotalBet(data)))
+                .replace("%bestWinners%", manager.getBestWinner(manager.getSessionData(session)))
                 .replace("%dice1%", String.valueOf(data.getDice1()))
                 .replace("%dice2%", String.valueOf(data.getDice2()))
                 .replace("%dice3%", String.valueOf(data.getDice3()))

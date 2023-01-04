@@ -10,7 +10,7 @@ public class SessionDataStorage {
     private static SessionStorage STORAGE;
 
     public static void init() {
-        File file = new File(TaiXiu.plugin.getDataFolder() + "/session/");
+        File file = new File(TaiXiu.getPlugin().getDataFolder() + "/session/");
         if (!file.exists()) {
             file.mkdirs();
         }

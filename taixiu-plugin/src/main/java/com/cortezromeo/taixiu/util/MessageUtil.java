@@ -14,8 +14,10 @@ import java.text.DecimalFormat;
 
 public class MessageUtil {
 
+    private static final TaiXiu plugin = TaiXiu.getPlugin();
+
     public static String formatMoney(long money) {
-        DecimalFormat formatter = new DecimalFormat(TaiXiu.plugin.getConfig().getString("format-money"));
+        DecimalFormat formatter = new DecimalFormat(plugin.getConfig().getString("format-money"));
         return formatter.format(money);
     }
 

@@ -6,10 +6,11 @@ import com.cortezromeo.taixiu.task.AutoSaveTask;
 public class AutoSaveManager {
 
     private static AutoSaveTask autoSaveTask;
+    private final static TaiXiu plugin = TaiXiu.getPlugin();
 
     public static void startAutoSave(int time) {
 
-        if (TaiXiu.plugin.getConfig().getBoolean("database.auto-save.enable") && autoSaveStatus == true && autoSaveTask != null)
+        if (plugin.getConfig().getBoolean("database.auto-save.enable") && autoSaveStatus && autoSaveTask != null)
             return;
 
         autoSaveTask = new AutoSaveTask(time);
@@ -19,7 +20,7 @@ public class AutoSaveManager {
 
     public static void stopAutoSave() {
 
-        if (autoSaveStatus = false  && autoSaveTask == null)
+        if (!autoSaveStatus && autoSaveTask == null)
             return;
 
         autoSaveTask.cancel();
@@ -33,7 +34,7 @@ public class AutoSaveManager {
             return;
 
         stopAutoSave();
-        startAutoSave(TaiXiu.plugin.getConfig().getInt("database.auto-save.time"));
+        startAutoSave(plugin.getConfig().getInt("database.auto-save.time"));
 
     }
 

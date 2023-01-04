@@ -23,48 +23,48 @@ import static com.cortezromeo.taixiu.util.MessageUtil.sendMessage;
 
 public class TaiXiuManager {
 
-    private static TaiXiuTask taiXiuTask = null;
+    private TaiXiuTask taiXiuTask = null;
 
-    public static TaiXiuTask getTaiXiuTask() {
-        return taiXiuTask;
-    }
+    public TaiXiuTask getTaiXiuTask() { return taiXiuTask; }
 
-    public static void startTask(int time) {
-        taiXiuTask = new TaiXiuTask(time);
-    }
+    public void startTask(int time) { taiXiuTask = new TaiXiuTask(time); }
 
-    public static TaiXiuState getState() {
-        return getTaiXiuTask().getState();
-    }
+    public TaiXiuState getState() { return getTaiXiuTask().getState(); }
 
-    public static void setState(TaiXiuState state) {
+    public void setState(TaiXiuState state) {
         getTaiXiuTask().setState(state);
     }
 
-    public static int getTime() {
+    public int getTime() {
         return getTaiXiuTask().getTime();
     }
 
-    public static void setTime(int time) {
+    public void setTime(int time) {
         getTaiXiuTask().setTime(time);
     }
 
-    public static ISession getSessionData() {
+    public ISession getSessionData() {
         return getTaiXiuTask().getSession();
     }
 
-    public static void setSessionData(ISession sessionData) {
+    public void setSessionData(ISession sessionData) {
         getTaiXiuTask().setSession(sessionData.getSession());
     }
 
-    public static ISession getSessionData(long session) {
+    private final static TaiXiu plugin = TaiXiu.getPlugin();
+
+    public ISession getSessionData(long session) {
         if (DatabaseManager.getSessionData(session) != null)
             return DatabaseManager.getSessionData(session);
 
         return null;
     }
 
-    public static void resultSeason(@NotNull ISession session, int dice1, int dice2, int dice3) {
+    public TaiXiuManager() {
+
+    }
+
+    public void resultSeason(@NotNull ISession session, int dice1, int dice2, int dice3) {
 
         debug("RESULTING SESSION", "Session number " + session.getSession());
 
@@ -74,7 +74,7 @@ public class TaiXiuManager {
         }
 
         Economy econ = VaultSupport.econ;
-        FileConfiguration cfg = TaiXiu.plugin.getConfig();
+        FileConfiguration cfg = plugin.getConfig();
 
         if (dice1 == 0)
             dice1 = ThreadLocalRandom.current().nextInt(1, 6 + 1);
@@ -171,7 +171,7 @@ public class TaiXiuManager {
                 sendBoardCast(messageF.getString("session-special-win"));
 
             SessionResultEvent event = new SessionResultEvent(session);
-            TaiXiu.plugin.getServer().getScheduler().runTask(TaiXiu.plugin, () -> TaiXiu.plugin.getServer().getPluginManager().callEvent(event));
+            plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
 
             debug("SESSION RESULTED", "Session: " + session.getSession() + " " +
                     "| Dice1: " + dice1 + " " +
@@ -184,7 +184,7 @@ public class TaiXiuManager {
         }
     }
 
-    public static Long getXiuBet(@NotNull ISession session) {
+    public Long getXiuBet(@NotNull ISession session) {
 
         long sum = 0L;
         if (session.getXiuPlayers() != null) {
@@ -195,7 +195,7 @@ public class TaiXiuManager {
         return sum;
     }
 
-    public static Long getTaiBet(@NotNull ISession session) {
+    public Long getTaiBet(@NotNull ISession session) {
 
         long sum = 0L;
         if (session.getTaiPlayers() != null) {
@@ -206,11 +206,11 @@ public class TaiXiuManager {
         return sum;
     }
 
-    public static Long getTotalBet(@NotNull ISession session) {
+    public Long getTotalBet(@NotNull ISession session) {
         return getXiuBet(session) + getTaiBet(session);
     }
 
-    public static String getBestWinner(@NotNull ISession session) {
+    public String getBestWinner(@NotNull ISession session) {
 
         TaiXiuResult result = session.getResult();
         FileConfiguration messageF = MessageFile.get();
@@ -221,10 +221,14 @@ public class TaiXiuManager {
             }
 
             if (result == TaiXiuResult.SPECIAL) {
-                return messageF.getString("bestWinners-format.valid-special").replace("%allBet%", MessageUtil.formatMoney(getTotalBet(session)));
+                return messageF.getString("bestWinners-format.valid-special")
+                        .replace("%allBet%", MessageUtil.formatMoney(getTotalBet(session)));
             }
 
-            HashMap<String, Long> bestWinners = (result == TaiXiuResult.XIU ? (session.getXiuPlayers() == null ? null : session.getXiuPlayers()) : (session.getTaiPlayers() == null ? null : session.getTaiPlayers()));
+            HashMap<String, Long> bestWinners = (result == TaiXiuResult.XIU ? (session.getXiuPlayers() == null ? null
+                    : session.getXiuPlayers())
+                    : (session.getTaiPlayers() == null ? null
+                    : session.getTaiPlayers()));
             Long bestWinnersBet = Collections.max(bestWinners.values());
 
             List<String> players = new ArrayList<>();
@@ -248,5 +252,4 @@ public class TaiXiuManager {
     public void stopTask() {
         getTaiXiuTask().cancel();
     }
-
 }

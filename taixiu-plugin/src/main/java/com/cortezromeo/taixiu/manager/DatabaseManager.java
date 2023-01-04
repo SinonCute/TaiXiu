@@ -23,6 +23,8 @@ public class DatabaseManager {
     public static PluginDisablingType pluginDisablingType;
     public static SessionEndingType sessionEndingType;
 
+    private static final TaiXiu plugin = TaiXiu.getPlugin();
+
     public static ISession getSessionData(long session) {
         if (!taiXiuData.containsKey(session)) {
             loadSessionData(session);
@@ -42,7 +44,7 @@ public class DatabaseManager {
 
     public static long getLastSessionFromFile() {
 
-        File sessionFolder = new File(TaiXiu.plugin.getDataFolder() + "/session");
+        File sessionFolder = new File(plugin.getDataFolder() + "/session");
         File[] listOfFilesSession = sessionFolder.listFiles();
 
         if (listOfFilesSession.length == 0) {
@@ -100,7 +102,7 @@ public class DatabaseManager {
         if (taiXiuData.containsKey(session))
             return true;
 
-        File file = new File(TaiXiu.plugin.getDataFolder() + "/session/" + String.valueOf(session) + ".yml");
+        File file = new File(plugin.getDataFolder() + "/session/" + session + ".yml");
         if (file.exists()) {
             try {
                 return true;
@@ -114,7 +116,7 @@ public class DatabaseManager {
 
     public static void loadLoadingType() {
 
-        FileConfiguration config = TaiXiu.plugin.getConfig();
+        FileConfiguration config = plugin.getConfig();
 
         sessionEndingType = SessionEndingType.valueOf(config.getString("database.while-ending-session.type").toUpperCase());
         pluginDisablingType = PluginDisablingType.valueOf(config.getString("database.while-disabling-plugin.type").toUpperCase());
@@ -123,7 +125,7 @@ public class DatabaseManager {
 
     public static void saveDatabase() {
 
-        File sessionFolder = new File(TaiXiu.plugin.getDataFolder() + "/session");
+        File sessionFolder = new File(plugin.getDataFolder() + "/session");
         File[] listOfFilesSession = sessionFolder.listFiles();
         if (listOfFilesSession == null)
             return;
@@ -144,24 +146,23 @@ public class DatabaseManager {
             log("&e[TAI XIU] Tiến hành save dữ liệu số " + DatabaseManager.getLastSession() + " và xóa tất cả dữ liệu cũ...");
 
             int totalFiles = 0;
-            for (int i = 0; i < listOfFilesSession.length; i++) {
-                if (listOfFilesSession[i].isFile()) {
+            for (File file : listOfFilesSession) {
+                if (file.isFile()) {
                     totalFiles++;
 
-                    File sessionFile = listOfFilesSession[i];
-                    Long session = Long.valueOf(FilenameUtils.removeExtension(sessionFile.getName()));
+                    long session = Long.parseLong(FilenameUtils.removeExtension(file.getName()));
                     if (session == getLastSessionFromFile()) {
                         totalFiles--;
 
-                        if(taiXiuData.containsKey(session))
+                        if (taiXiuData.containsKey(session))
                             saveSessionData(session);
                         continue;
                     }
 
-                    if(sessionFile.delete()) {
+                    if (file.delete()) {
                         // stuffs
                     } else {
-                        thowErrorMessage("KHÔNG THỂ XÓA FILE " + sessionFile.getName());
+                        thowErrorMessage("KHÔNG THỂ XÓA FILE " + file.getName());
                     }
                 }
             }

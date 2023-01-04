@@ -20,9 +20,11 @@ public class TaiXiuTask implements Runnable {
     private int time;
     private TaiXiuState state;
     private ISession data;
+    private final TaiXiu plugin = TaiXiu.getPlugin();
+    private final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
 
     public TaiXiuTask(int time) {
-        this.task = Bukkit.getScheduler().runTaskTimer(TaiXiu.plugin, this, 0, 20L);
+        this.task = Bukkit.getScheduler().runTaskTimer(plugin, this, 0, 20L);
         data = DatabaseManager.getSessionData(DatabaseManager.getLastSessionFromFile());
         this.time = time;
         this.state = TaiXiuState.PLAYING;
@@ -76,12 +78,12 @@ public class TaiXiuTask implements Runnable {
                     time = 0;
 
                 if (time == 0) {
-                    time = TaiXiu.plugin.getConfig().getInt("task.taiXiuTask.time-per-session");
+                    time = plugin.getConfig().getInt("task.taiXiuTask.time-per-session");
 
                     if (getSession().getTaiPlayers().isEmpty() && getSession().getXiuPlayers().isEmpty()) {
                         MessageUtil.sendBoardCast(MessageFile.get().getString("session-result-not-enough-player").replace("%session%", String.valueOf(getSession().getSession())));
                     } else {
-                        TaiXiuManager.resultSeason(getSession(), 0, 0, 0);
+                        manager.resultSeason(getSession(), 0, 0, 0);
 
                         ISession oldSessionData = getSession();
                         long newSession = DatabaseManager.getLastSession() + 1;
@@ -92,7 +94,7 @@ public class TaiXiuTask implements Runnable {
                         debug("SESSION SWAPPED", "Old session: " + oldSessionData.getSession() + " " +
                                 "| New session: " + newSession);
 
-                        TaiXiu.plugin.getServer().getScheduler().runTask(TaiXiu.plugin, () -> TaiXiu.plugin.getServer().getPluginManager().callEvent(event));
+                        plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
 
                         if (DatabaseManager.sessionEndingType == SessionEndingType.SAVE) {
                             DatabaseManager.saveSessionData(oldSessionData.getSession());
@@ -105,7 +107,7 @@ public class TaiXiuTask implements Runnable {
                 cancel();
                 MessageUtil.thowErrorMessage("" + e);
                 setSession(DatabaseManager.getLastSession() + 1);
-                TaiXiuManager.startTask(TaiXiu.plugin.getConfig().getInt("task.taiXiuTask.time-per-session"));
+                manager.startTask(plugin.getConfig().getInt("task.taiXiuTask.time-per-session"));
             }
         }
     }

@@ -9,7 +9,7 @@ public class VaultSupport {
     public static Economy econ;
 
     public static boolean setup() {
-        RegisteredServiceProvider<Economy> rsp = TaiXiu.plugin.getServer().getServicesManager().getRegistration(Economy.class);
+        RegisteredServiceProvider<Economy> rsp = TaiXiu.getPlugin().getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             return false;
         }

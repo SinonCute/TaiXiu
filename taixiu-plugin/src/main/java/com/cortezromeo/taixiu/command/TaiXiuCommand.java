@@ -31,11 +31,12 @@ import static com.cortezromeo.taixiu.util.MessageUtil.sendMessage;
 
 public class TaiXiuCommand implements CommandExecutor, TabExecutor {
 
-    private TaiXiu plugin;
+    private final TaiXiu plugin;
+    private final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
 
     public TaiXiuCommand(TaiXiu plugin) {
         this.plugin = plugin;
-        plugin.getCommand("taixiu").setExecutor((CommandExecutor) this);
+        plugin.getCommand("taixiu").setExecutor(this);
     }
 
     @Override
@@ -55,8 +56,8 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
         Player p = (Player) sender;
         String pName = p.getName();
         Economy econ = VaultSupport.econ;
-        ISession data = TaiXiuManager.getSessionData();
-        FileConfiguration cfg = TaiXiu.plugin.getConfig();
+        ISession data = manager.getSessionData();
+        FileConfiguration cfg = plugin.getConfig();
 
         if (args.length == 1) {
             switch (args[0]) {
@@ -70,7 +71,7 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
                     }
                     return false;
                 case "thongtin":
-                    TaiXiuInfoPagedPane.openInventory(p, TaiXiuManager.getSessionData().getSession());
+                    TaiXiuInfoPagedPane.openInventory(p, manager.getSessionData().getSession());
                     return false;
                 case "toggle":
 
@@ -139,9 +140,9 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
                     }
 
                     int configDisableTime = cfg.getInt("bet-settings.disable-while-remaining");
-                    if (TaiXiuManager.getTime() < configDisableTime) {
+                    if (manager.getTime() < configDisableTime) {
                         sendMessage(p, messageF.getString("late-bet")
-                                .replaceAll("%time%", String.valueOf(TaiXiuManager.getTime()))
+                                .replaceAll("%time%", String.valueOf(manager.getTime()))
                                 .replaceAll("%configDisableTime%", String.valueOf(configDisableTime)));
                         return false;
                     }
@@ -195,7 +196,7 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
                             .replace("%bet%", MessageUtil.getFormatName(result))
                             .replace("%money%", MessageUtil.formatMoney(money))
                             .replace("%session%", String.valueOf(data.getSession()))
-                            .replace("%time%", String.valueOf(TaiXiuManager.getTime())));
+                            .replace("%time%", String.valueOf(manager.getTime())));
 
                     String messageBoardcastPlayerBet = messageF.getString("broadcast-player-bet")
                             .replace("%prefix%", messageF.getString("prefix"))
@@ -213,7 +214,7 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
 
                     debug("PLAYER BETTED",
                             "Name: " + pName + " " +
-                            "| Bet: " + result.toString() + " " +
+                            "| Bet: " + result + " " +
                             "| Money: " + money + " " +
                             "| Session: " + data.getSession());
 
@@ -225,7 +226,7 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
         }
 
         for (String string : messageF.getStringList("command-taixiu")) {
-            string = string.replace("%version%", TaiXiu.plugin.getDescription().getVersion());
+            string = string.replace("%version%", plugin.getDescription().getVersion());
             sendMessage(p, string);
         }
         return false;

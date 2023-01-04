@@ -11,9 +11,10 @@ public class InventoryFile {
 
     private static File file;
     private static FileConfiguration inventoryFile;
+    private final static TaiXiu plugin = TaiXiu.getPlugin();
 
     public static void setup() {
-        file = new File(TaiXiu.plugin.getDataFolder() + "/inventory.yml");
+        file = new File(plugin.getDataFolder() + "/inventory.yml");
 
         if (!file.exists()) {
             try {
@@ -30,7 +31,7 @@ public class InventoryFile {
     }
 
     public static void fileExists() {
-        file = new File(TaiXiu.plugin.getDataFolder() + "/inventory.yml");
+        file = new File(plugin.getDataFolder() + "/inventory.yml");
         inventoryFile = YamlConfiguration.loadConfiguration(file);
     }
 

@@ -7,22 +7,23 @@ import com.cortezromeo.taixiu.manager.TaiXiuManager;
 import com.cortezromeo.taixiu.util.MessageUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class PAPISupport extends PlaceholderExpansion {
 
     @Override
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return "Cortez_Romeo";
     }
 
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "taixiu";
     }
 
     @Override
-    public String getVersion() {
-        return TaiXiu.plugin.getDescription().getVersion();
+    public @NotNull String getVersion() {
+        return TaiXiu.getPlugin().getDescription().getVersion();
     }
 
     @Override
@@ -101,7 +102,7 @@ public class PAPISupport extends PlaceholderExpansion {
                 return "";
             }
 
-            return String.valueOf(TaiXiuManager.getTotalBet(session));
+            return String.valueOf(TaiXiu.getTaiXiuManager().getTotalBet(session));
         }
 
         return null;

@@ -30,7 +30,8 @@ import static com.cortezromeo.taixiu.util.MessageUtil.log;
 
 public final class TaiXiu extends JavaPlugin {
 
-    public static TaiXiu plugin;
+    private static TaiXiu plugin;
+    private static TaiXiuManager taiXiuManager;
     private static final String version = Bukkit.getServer().getClass().getName().split("\\.")[3];
     public static VersionSupport nms;
     private boolean serverSoftwareSupport = true;
@@ -65,11 +66,14 @@ public final class TaiXiu extends JavaPlugin {
         setDebug(getConfig().getBoolean("debug"));
 
         initDatabase();
+
+        taiXiuManager = new TaiXiuManager();
+        taiXiuManager.startTask(getConfig().getInt("task.taiXiuTask.time-per-session"));
+
         initCommand();
         initListener();
         initSupport();
 
-        TaiXiuManager.startTask(getConfig().getInt("task.taiXiuTask.time-per-session"));
         AutoSaveManager.startAutoSave(getConfig().getInt("database.auto-save.time"));
         BossBarManager.setupValue();
 
@@ -157,6 +161,10 @@ public final class TaiXiu extends JavaPlugin {
         return version;
     }
 
+    public static TaiXiu getPlugin() {
+        return plugin;
+    }
+
     public static String getForCurrentVersion(String v12, String v13) {
         switch (getServerVersion()) {
             case "v1_9_R1":
@@ -188,7 +196,9 @@ public final class TaiXiu extends JavaPlugin {
             if (bossBar != null)
                 bossBar.removeAll();
         }
+    }
 
-
+    public static TaiXiuManager getTaiXiuManager() {
+        return taiXiuManager;
     }
 }

@@ -11,10 +11,11 @@ import static com.cortezromeo.taixiu.util.MessageUtil.log;
 
 public class AutoSaveTask implements Runnable {
 
-    private BukkitTask task;
+    private final BukkitTask task;
+    private static final TaiXiu plugin = TaiXiu.getPlugin();
 
     public AutoSaveTask(int time) {
-        this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(TaiXiu.plugin, this, 20L * time, 20L * time);
+        this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this, 20L * time, 20L * time);
     }
 
     public BukkitTask getBukkitTask() {

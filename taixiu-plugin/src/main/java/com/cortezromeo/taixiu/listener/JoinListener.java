@@ -21,7 +21,8 @@ public class JoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
 
         Player p = event.getPlayer();
-        if (TaiXiu.plugin.getConfig().getBoolean("toggle-settings.auto-toggle") && !DatabaseManager.togglePlayers.contains(p.getName())) {
+        if (TaiXiu.getPlugin().getConfig().getBoolean("toggle-settings.auto-toggle") &&
+                !DatabaseManager.togglePlayers.contains(p.getName())) {
             DatabaseManager.togglePlayers.add(p.getName());
             BossBarManager.toggleBossBar(p);
         }

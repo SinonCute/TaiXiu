@@ -14,7 +14,7 @@ import java.util.List;
 public class SessionFileStorage implements SessionStorage  {
 
     private static File getFile(long session) {
-        File file = new File(TaiXiu.plugin.getDataFolder() + "/session/" + String.valueOf(session) + ".yml");
+        File file = new File(TaiXiu.getPlugin().getDataFolder() + "/session/" + String.valueOf(session) + ".yml");
         if (!file.exists()) {
             try {
                 file.createNewFile();
