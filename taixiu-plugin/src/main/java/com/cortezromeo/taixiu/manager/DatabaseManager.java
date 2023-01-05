@@ -23,16 +23,23 @@ public class DatabaseManager {
     public static PluginDisablingType pluginDisablingType;
     public static SessionEndingType sessionEndingType;
 
-    private static final TaiXiu plugin = TaiXiu.getPlugin();
+    private static DatabaseManager instance;
 
-    public static ISession getSessionData(long session) {
+    private static TaiXiu plugin;
+
+    public DatabaseManager(TaiXiu taiXiu) {
+        plugin = taiXiu;
+        instance = this;
+    }
+
+    public ISession getSessionData(long session) {
         if (!taiXiuData.containsKey(session)) {
             loadSessionData(session);
         }
         return taiXiuData.get(session);
     }
 
-    public static long getLastSession() {
+    public long getLastSession() {
         if (taiXiuData.isEmpty())
             lastSession = 0;
         else {
@@ -42,7 +49,7 @@ public class DatabaseManager {
         return lastSession;
     }
 
-    public static long getLastSessionFromFile() {
+    public long getLastSessionFromFile() {
 
         File sessionFolder = new File(plugin.getDataFolder() + "/session");
         File[] listOfFilesSession = sessionFolder.listFiles();
@@ -72,7 +79,7 @@ public class DatabaseManager {
         return Collections.max(sessions);
     }
 
-    public static void loadSessionData(long session) {
+    public void loadSessionData(long session) {
 
         debug("LOADING SESSION DATA", "Session number " + session);
         if (taiXiuData.containsKey(session))
@@ -82,14 +89,14 @@ public class DatabaseManager {
         debug("SESSION DATA LOADED", "Session number " + session);
     }
 
-    public static void saveSessionData(long session) {
+    public void saveSessionData(long session) {
 
         debug("SAVING SESSION DATA", "Session number " + session);
         SessionDataStorage.saveTaiXiuData(session, taiXiuData.get(session));
         debug("SESSION DATA SAVED", "Session number " + session);
     }
 
-    public static void unloadSessionData(long session) {
+    public void unloadSessionData(long session) {
 
         debug("UNLOADING SESSION DATA", "Session number " + session);
         SessionDataStorage.saveTaiXiuData(session, taiXiuData.get(session));
@@ -97,7 +104,7 @@ public class DatabaseManager {
         debug("SESSION DATA UNLOADED", "Session number " + session);
     }
 
-    public static boolean checkExistsFileData(long session) {
+    public boolean checkExistsFileData(long session) {
 
         if (taiXiuData.containsKey(session))
             return true;
@@ -114,7 +121,7 @@ public class DatabaseManager {
         return false;
     }
 
-    public static void loadLoadingType() {
+    public void loadLoadingType() {
 
         FileConfiguration config = plugin.getConfig();
 
@@ -123,7 +130,7 @@ public class DatabaseManager {
 
     }
 
-    public static void saveDatabase() {
+    public void saveDatabase() {
 
         File sessionFolder = new File(plugin.getDataFolder() + "/session");
         File[] listOfFilesSession = sessionFolder.listFiles();
@@ -137,13 +144,13 @@ public class DatabaseManager {
                 saveSessionData(session);
             log("&e[TAI XIU] Save " + sessionData.size() + " dữ liệu thành công!");
         } else if (DatabaseManager.pluginDisablingType == PluginDisablingType.SAVE_LATEST) {
-            long latestSession = DatabaseManager.getLastSession();
+            long latestSession = getLastSession();
 
             log("&e[TAI XIU] Tiến hành save dữ liệu cuối cùng (Số " + latestSession + ")");
             saveSessionData(latestSession);
             log("&e[TAI XIU] Save dữ liệu số " + latestSession + " thành công!");
         } else {
-            log("&e[TAI XIU] Tiến hành save dữ liệu số " + DatabaseManager.getLastSession() + " và xóa tất cả dữ liệu cũ...");
+            log("&e[TAI XIU] Tiến hành save dữ liệu số " + getLastSession() + " và xóa tất cả dữ liệu cũ...");
 
             int totalFiles = 0;
             for (File file : listOfFilesSession) {
@@ -166,8 +173,11 @@ public class DatabaseManager {
                     }
                 }
             }
-            log("&e[TAI XIU] Save thành công dữ liệu số " + DatabaseManager.getLastSession() + " và xóa " + totalFiles + " dữ liệu!");
+            log("&e[TAI XIU] Save thành công dữ liệu số " + getLastSession() + " và xóa " + totalFiles + " dữ liệu!");
         }
     }
 
+    public static DatabaseManager getInstance() {
+        return instance;
+    }
 }

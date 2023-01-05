@@ -32,6 +32,7 @@ public final class TaiXiu extends JavaPlugin {
 
     private static TaiXiu plugin;
     private static TaiXiuManager taiXiuManager;
+    private static DatabaseManager databaseManager;
     private static final String version = Bukkit.getServer().getClass().getName().split("\\.")[3];
     public static VersionSupport nms;
     private boolean serverSoftwareSupport = true;
@@ -67,7 +68,7 @@ public final class TaiXiu extends JavaPlugin {
 
         initDatabase();
 
-        taiXiuManager = new TaiXiuManager();
+        taiXiuManager = new TaiXiuManager(this);
         taiXiuManager.startTask(getConfig().getInt("task.taiXiuTask.time-per-session"));
 
         initCommand();
@@ -121,7 +122,8 @@ public final class TaiXiu extends JavaPlugin {
     }
 
     private void initDatabase() {
-        DatabaseManager.loadLoadingType();
+        databaseManager = new DatabaseManager(this);
+        databaseManager.loadLoadingType();
         SessionDataStorage.init();
     }
 
@@ -189,7 +191,7 @@ public final class TaiXiu extends JavaPlugin {
         log("&fAuthor: &bCortez_Romeo");
         log("&f--------------------------------");
 
-        DatabaseManager.saveDatabase();
+        databaseManager.saveDatabase();
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             BossBar bossBar = BossBarManager.bossBarPlayers.get(p);
@@ -200,5 +202,9 @@ public final class TaiXiu extends JavaPlugin {
 
     public static TaiXiuManager getTaiXiuManager() {
         return taiXiuManager;
+    }
+
+    public static DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }

@@ -33,6 +33,7 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
 
     private final TaiXiu plugin;
     private final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
+    private final DatabaseManager databaseManager = TaiXiu.getDatabaseManager();
 
     public TaiXiuCommand(TaiXiu plugin) {
         this.plugin = plugin;
@@ -106,8 +107,8 @@ public class TaiXiuCommand implements CommandExecutor, TabExecutor {
                     }
 
                     try {
-                        if (DatabaseManager.checkExistsFileData(session)) {
-                            DatabaseManager.loadSessionData(session);
+                        if (databaseManager.checkExistsFileData(session)) {
+                            databaseManager.loadSessionData(session);
                             TaiXiuInfoPagedPane.openInventory(p, session);
                         } else {
                             if (!DatabaseManager.taiXiuData.containsKey(session)) {

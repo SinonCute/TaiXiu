@@ -23,6 +23,8 @@ import static com.cortezromeo.taixiu.util.MessageUtil.sendMessage;
 
 public class TaiXiuManager {
 
+    private TaiXiuManager instance;
+
     private TaiXiuTask taiXiuTask = null;
 
     public TaiXiuTask getTaiXiuTask() { return taiXiuTask; }
@@ -51,17 +53,17 @@ public class TaiXiuManager {
         getTaiXiuTask().setSession(sessionData.getSession());
     }
 
-    private final static TaiXiu plugin = TaiXiu.getPlugin();
+    private static TaiXiu plugin;
 
     public ISession getSessionData(long session) {
-        if (DatabaseManager.getSessionData(session) != null)
-            return DatabaseManager.getSessionData(session);
-
+        if (DatabaseManager.getInstance().getSessionData(session) != null)
+            return DatabaseManager.getInstance().getSessionData(session);
         return null;
     }
 
-    public TaiXiuManager() {
-
+    public TaiXiuManager(TaiXiu taiXiu) {
+        plugin = taiXiu;
+        instance = this;
     }
 
     public void resultSeason(@NotNull ISession session, int dice1, int dice2, int dice3) {
@@ -251,5 +253,9 @@ public class TaiXiuManager {
 
     public void stopTask() {
         getTaiXiuTask().cancel();
+    }
+
+    public TaiXiuManager getInstance() {
+        return instance;
     }
 }

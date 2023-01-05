@@ -27,6 +27,8 @@ import static com.cortezromeo.taixiu.util.MessageUtil.sendBoardCast;
 public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
     private final TaiXiu plugin;
     private final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
+    private final DatabaseManager databaseManager = TaiXiu.getDatabaseManager();
+
 
     public TaiXiuAdminCommand(TaiXiu plugin) {
         this.plugin = plugin;
@@ -64,7 +66,7 @@ public class TaiXiuAdminCommand implements CommandExecutor, TabExecutor {
                     plugin.reloadConfig();
                     MessageFile.reload();
                     InventoryFile.reload();
-                    DatabaseManager.loadLoadingType();
+                    databaseManager.loadLoadingType();
                     BossBarManager.setupValue();
 
                     setDebug(plugin.getConfig().getBoolean("debug"));

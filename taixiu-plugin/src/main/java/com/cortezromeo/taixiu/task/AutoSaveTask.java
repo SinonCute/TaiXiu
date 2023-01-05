@@ -13,6 +13,7 @@ public class AutoSaveTask implements Runnable {
 
     private final BukkitTask task;
     private static final TaiXiu plugin = TaiXiu.getPlugin();
+    private static final DatabaseManager databaseManager = TaiXiu.getDatabaseManager();
 
     public AutoSaveTask(int time) {
         this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this, 20L * time, 20L * time);
@@ -32,7 +33,7 @@ public class AutoSaveTask implements Runnable {
         Set<Long> sessionData = DatabaseManager.taiXiuData.keySet();
         log("&e[TAI XIU] Tiến hành save " + sessionData.size() + " dữ liệu...");
         for (long session : sessionData)
-            DatabaseManager.saveSessionData(session);
+            databaseManager.saveSessionData(session);
         log("&e[TAI XIU] Save " + sessionData.size() + " dữ liệu thành công!");
 
     }

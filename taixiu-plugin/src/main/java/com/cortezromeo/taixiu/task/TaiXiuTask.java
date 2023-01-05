@@ -22,10 +22,11 @@ public class TaiXiuTask implements Runnable {
     private ISession data;
     private final TaiXiu plugin = TaiXiu.getPlugin();
     private final TaiXiuManager manager = TaiXiu.getTaiXiuManager();
+    private final DatabaseManager databaseManager = TaiXiu.getDatabaseManager();
 
     public TaiXiuTask(int time) {
         this.task = Bukkit.getScheduler().runTaskTimer(plugin, this, 0, 20L);
-        data = DatabaseManager.getSessionData(DatabaseManager.getLastSessionFromFile());
+        data = databaseManager.getSessionData(databaseManager.getLastSessionFromFile());
         this.time = time;
         this.state = TaiXiuState.PLAYING;
 
@@ -61,7 +62,7 @@ public class TaiXiuTask implements Runnable {
     }
 
     public void setSession(long session) {
-        this.data = DatabaseManager.getSessionData(session);
+        this.data = databaseManager.getSessionData(session);
     }
 
     public void setSession(ISession session) {
@@ -86,7 +87,7 @@ public class TaiXiuTask implements Runnable {
                         manager.resultSeason(getSession(), 0, 0, 0);
 
                         ISession oldSessionData = getSession();
-                        long newSession = DatabaseManager.getLastSession() + 1;
+                        long newSession = databaseManager.getLastSession() + 1;
                         setSession(newSession);
 
                         SessionSwapEvent event = new SessionSwapEvent(oldSessionData, getSession());
@@ -97,16 +98,16 @@ public class TaiXiuTask implements Runnable {
                         plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
 
                         if (DatabaseManager.sessionEndingType == SessionEndingType.SAVE) {
-                            DatabaseManager.saveSessionData(oldSessionData.getSession());
+                            databaseManager.saveSessionData(oldSessionData.getSession());
                         } else {
-                            DatabaseManager.unloadSessionData(oldSessionData.getSession());
+                            databaseManager.unloadSessionData(oldSessionData.getSession());
                         }
                     }
                 }
             } catch (Exception e) {
                 cancel();
                 MessageUtil.thowErrorMessage("" + e);
-                setSession(DatabaseManager.getLastSession() + 1);
+                setSession(databaseManager.getLastSession() + 1);
                 manager.startTask(plugin.getConfig().getInt("task.taiXiuTask.time-per-session"));
             }
         }
